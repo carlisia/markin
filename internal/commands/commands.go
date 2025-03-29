@@ -16,40 +16,42 @@ const (
 	reset  = "\033[0m"
 )
 
-// NewInsertCmd creates the insert command
-func NewInsertCmd(cfg *config.Config) *cobra.Command {
-	var line string
+// NewFlCmd creates the fleeting note command
+func NewFlCmd(cfg *config.Config) *cobra.Command {
+	var note string
 
 	cmd := &cobra.Command{
-		Use:   "insert [line]",
-		Short: "Insert a line into a specific section of a markdown file",
-		Long: `Insert a line into a specific section of a markdown file.
-If no line is provided, no insertion will be performed.`,
+		Use:   "fl [note]",
+		Short: "Add a fleeting note entry to a markdown file",
+		Long: `Add a fleeting note entry to a markdown file.
+A fleeting note is a quick thought or idea that you want to capture.
+The note will be added as a bullet item with a timestamp.
+If no note is provided, no entry will be added.`,
 		Args: cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) > 0 {
-				line = args[0]
+				note = args[0]
 			}
 
-			if line == "" {
-				fmt.Println("No line provided. Skipping insertion.")
+			if note == "" {
+				fmt.Println("No note provided. Skipping entry.")
 				return nil
 			}
 
 			// Format current time
 			now := time.Now()
 			timeStr := now.Format("03:04:05 pm")
-			formattedLine := fmt.Sprintf("- ⚡ *%s:* **Fleeting**:: %s", timeStr, line)
+			bulletItem := fmt.Sprintf("- ⚡ *%s:* **Fleeting**:: %s", timeStr, note)
 
 			if err := markdown.InsertLine(
 				cfg.MarkdownDir,
 				cfg.MarkdownFile,
 				cfg.Section,
-				formattedLine,
+				bulletItem,
 				cfg.Position,
 				cfg.CreateSectionIfMissing,
 			); err != nil {
-				return fmt.Errorf("failed to insert line: %w", err)
+				return fmt.Errorf("failed to add fleeting note entry: %w", err)
 			}
 			return nil
 		},

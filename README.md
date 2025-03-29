@@ -1,14 +1,14 @@
 # Markin
 
-A CLI tool for inserting small blurbs, snippets, text updates into markdown notes. It pairs well with Obsidian, but can serve as a note tracker for any set of markdown files.
+A CLI tool for managing markdown notes, with a focus on Obsidian vaults.
 
 ## Features
 
-- Insert lines into specific sections of markdown files
+- Add different types of note entries to markdown files
 - Support for Obsidian vaults
 - Configurable section names and positions
 - Automatic section creation if missing
-- Timestamp prefix for inserted lines
+- Timestamp prefix for entries
 - Silent operation with no terminal output
 
 ## Installation
@@ -33,8 +33,8 @@ create_section_if_missing: true
 
 - `markdown_dir`: Directory containing the markdown file (can use environment variables)
 - `markdown_file`: Name of the markdown file to modify
-- `section`: Section name to insert lines into (default: "## 💭 ✍️ ✨ Notes")
-- `position`: Where to insert lines in the section ("after-heading" or "before-end")
+- `section`: Section name to add entries to (default: "## 💭 ✍️ ✨ Notes")
+- `position`: Where to add entries in the section ("after-heading" or "before-end")
 - `create_section_if_missing`: Whether to create the section if it doesn't exist
 
 ## Usage
@@ -45,16 +45,16 @@ Initialize the configuration:
 markin init
 ```
 
-Insert a line:
+Add a fleeting note entry:
 
 ```bash
-markin insert "Your note here"
+markin fl "Your fleeting thought here"
 ```
 
-This will insert a line like:
+This will add an entry like:
 
 ```markdown
-- ⚡ _06:33:45 pm:_ **Fleeting**:: Your note here
+- ⚡ *06:33:45 pm:* **Fleeting**:: Your fleeting thought here
 ```
 
 ## Development
