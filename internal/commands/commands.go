@@ -16,59 +16,49 @@ const (
 	reset  = "\033[0m"
 )
 
-// NewFlCmd creates the fleeting note command
-func NewFlCmd(cfg *config.Config) *cobra.Command {
-	var note string
-
+// NewFlCmd creates a command for adding a fleeting note
+func NewFlCmd(cfg *config.Config, debug bool) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "fl [note]",
-		Short: "Add a fleeting note entry to a markdown file",
-		Long: `Add a fleeting note entry to a markdown file.
-A fleeting note is a quick thought or idea that you want to capture.
-The note will be added as a bullet item with a timestamp.
-If no note is provided, no entry will be added.`,
-		Args: cobra.MaximumNArgs(1),
+		Short: "Add a fleeting note to your daily note",
+		Long: `Add a fleeting note to your daily note file.
+The note will be added under the configured section.`,
+		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if len(args) > 0 {
-				note = args[0]
-			}
-
-			if note == "" {
-				fmt.Println("No note provided. Skipping entry.")
-				return nil
-			}
-
-			// Format current time
-			now := time.Now()
-			timeStr := now.Format("03:04:05 pm")
-			bulletItem := fmt.Sprintf("- ⚡ *%s:* **Fleeting**:: %s", timeStr, note)
-
-			if err := markdown.InsertLine(
-				cfg.MarkdownDir,
-				cfg.MarkdownFile,
+			note := args[0]
+			timestamp := time.Now().Format("03:04:05 pm")
+			formattedNote := fmt.Sprintf("- ⚡ *%s:* **Fleeting**:: %s", timestamp, note)
+			if err := markdown.AddLine(
+				cfg.ProjectDir,
+				cfg.DailyNotePath,
+				cfg.DailyNoteName,
 				cfg.Section,
-				bulletItem,
+				formattedNote,
 				cfg.Position,
 				cfg.CreateSectionIfMissing,
+				debug,
 			); err != nil {
-				return fmt.Errorf("failed to add fleeting note entry: %w", err)
+				cmd.SilenceUsage = true
+				return fmt.Errorf("failed to add fleeting note: %w", err)
 			}
 			return nil
 		},
 	}
-
 	return cmd
 }
 
-// NewInitCmd creates the init command
+// NewInitCmd creates a command for initializing the configuration
 func NewInitCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "init",
-		Short: "Generate a sample config file in $HOME/.config/markin/.markin.yaml",
+		Short: "Initialize the configuration file",
+		Long: `Initialize the configuration file with default settings.
+This will create a sample configuration file in your home directory.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if err := config.GenerateSampleConfig(); err != nil {
-				return fmt.Errorf("failed to generate sample config: %w", err)
+			if err := config.GenerateSampleConfig(""); err != nil {
+				return fmt.Errorf("failed to generate sample configuration: %w", err)
 			}
+			fmt.Println("Configuration file created successfully!")
 			return nil
 		},
 	}
